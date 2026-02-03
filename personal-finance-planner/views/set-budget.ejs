@@ -1,0 +1,295 @@
+<!-- views/set-budgets.ejs -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Set Budget - Finance Planner</title>
+    <style>
+        :root {
+            --primary: #4361ee; --primary-dark: #3a56d4; --secondary: #7209b7;
+            --success: #27ae60; --warning: #f39c12; --danger: #e74c3c;
+            --light: #f8f9fa; --dark: #212529; --gray: #6c757d;
+            --border-radius: 10px; --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background: #f5f7fa; color: var(--dark); line-height: 1.6; }
+        .navbar { background: white; box-shadow: var(--box-shadow); padding: 1rem 0; }
+        .nav-container { width: 90%; max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+        .nav-logo { color: var(--primary); font-weight: 700; font-size: 1.5rem; }
+        .btn { padding: 0.7rem 1.5rem; background: var(--primary); color: white; text-decoration: none; border-radius: var(--border-radius); font-weight: 600; border: none; cursor: pointer; }
+        .btn-success { background: var(--success); }
+        .btn-outline { background: transparent; border: 2px solid var(--primary); color: var(--primary); }
+        .container { width: 90%; max-width: 1200px; margin: 0 auto; padding: 2rem 0; }
+        .card { background: white; border-radius: var(--border-radius); padding: 2rem; box-shadow: var(--box-shadow); margin-bottom: 2rem; }
+        
+        .form-group { margin-bottom: 1.5rem; }
+        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 600; color: var(--dark); }
+        .form-group input, .form-group select { width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: var(--border-radius); font-size: 1rem; }
+        .form-group input:focus, .form-group select:focus { outline: none; border-color: var(--primary); }
+        
+        .ai-suggestions { background: #e8f4fd; padding: 1.5rem; border-radius: var(--border-radius); margin: 1.5rem 0; }
+        .suggestion-item { display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid #d1e7ff; }
+        
+        .budget-categories { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin: 1.5rem 0; }
+        .category-card { background: #f8f9fa; padding: 1rem; border-radius: var(--border-radius); text-align: center; }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <h2 class="nav-logo">📈 Finance Planner</h2>
+            <div class="nav-links">
+                <span>Welcome, <%= user.username %></span>
+                <a href="/dashboard" class="btn">Dashboard</a>
+                <a href="/budgets" class="btn">View Budgets</a>
+            </div>
+        </div>
+    </nav>
+    
+    <main class="container">
+        <div class="card">
+            <h1>💰 Set Monthly Budget</h1>
+            <p>Plan your monthly spending by setting budgets for different categories</p>
+        </div>
+
+        <!-- AI Budget Suggestions -->
+        <div class="card">
+            <h2>🤖 AI Budget Recommendations</h2>
+            <div class="ai-suggestions">
+                <h3 style="color: var(--primary); margin-bottom: 1rem;">Based on your income: ₹<%= typeof monthlyIncome !== 'undefined' ? monthlyIncome : '10,000' %></h3>
+                
+                <div class="suggestion-item">
+                    <span>Food & Dining</span>
+                    <span style="font-weight: bold; color: var(--success);">₹1,500</span>
+                </div>
+                <div class="suggestion-item">
+                    <span>Transportation</span>
+                    <span style="font-weight: bold; color: var(--success);">₹1,000</span>
+                </div>
+                <div class="suggestion-item">
+                    <span>Entertainment</span>
+                    <span style="font-weight: bold; color: var(--success);">₹800</span>
+                </div>
+                <div class="suggestion-item">
+                    <span>Education</span>
+                    <span style="font-weight: bold; color: var(--success);">₹1,200</span>
+                </div>
+                <div class="suggestion-item">
+                    <span>Savings</span>
+                    <span style="font-weight: bold; color: var(--success);">₹2,000</span>
+                </div>
+                <div class="suggestion-item">
+                    <span>Other Expenses</span>
+                    <span style="font-weight: bold; color: var(--success);">₹1,000</span>
+                </div>
+                
+                <div style="margin-top: 1rem; padding-top: 1rem; border-top: 2px solid #d1e7ff;">
+                    <div style="display: flex; justify-content: space-between; font-weight: bold;">
+                        <span>Total Recommended Budget:</span>
+                        <span style="color: var(--primary);">₹6,500</span>
+                    </div>
+                </div>
+                
+                <button onclick="applyAISuggestions()" class="btn btn-success" style="margin-top: 1rem; width: 100%;">
+                    🚀 Apply AI Recommendations
+                </button>
+            </div>
+        </div>
+
+        <!-- Budget Setting Form -->
+        <div class="card">
+            <h2>📊 Set Your Budgets</h2>
+            <form id="budgetForm">
+                <div class="form-group">
+                    <label for="month">Budget Month</label>
+                    <select id="month" name="month" required>
+                        <option value="1">January</option>
+                        <option value="2">February</option>
+                        <option value="3">March</option>
+                        <option value="4">April</option>
+                        <option value="5">May</option>
+                        <option value="6">June</option>
+                        <option value="7">July</option>
+                        <option value="8">August</option>
+                        <option value="9">September</option>
+                        <option value="10" selected>October</option>
+                        <option value="11">November</option>
+                        <option value="12">December</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="year">Budget Year</label>
+                    <input type="number" id="year" name="year" value="2025" min="2024" max="2030" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="monthlyIncome">Monthly Income (₹)</label>
+                    <input type="number" id="monthlyIncome" name="monthlyIncome" value="10000" min="0" required>
+                </div>
+
+                <h3 style="margin: 2rem 0 1rem 0; color: var(--primary);">Category-wise Budgets</h3>
+
+                <div class="budget-categories">
+                    <div class="category-card">
+                        <label for="foodBudget">🍕 Food & Dining</label>
+                        <input type="number" id="foodBudget" name="foodBudget" placeholder="e.g., 1500" min="0">
+                    </div>
+                    
+                    <div class="category-card">
+                        <label for="transportBudget">🚗 Transportation</label>
+                        <input type="number" id="transportBudget" name="transportBudget" placeholder="e.g., 1000" min="0">
+                    </div>
+                    
+                    <div class="category-card">
+                        <label for="entertainmentBudget">🎬 Entertainment</label>
+                        <input type="number" id="entertainmentBudget" name="entertainmentBudget" placeholder="e.g., 800" min="0">
+                    </div>
+                    
+                    <div class="category-card">
+                        <label for="educationBudget">📚 Education</label>
+                        <input type="number" id="educationBudget" name="educationBudget" placeholder="e.g., 1200" min="0">
+                    </div>
+                    
+                    <div class="category-card">
+                        <label for="shoppingBudget">🛍️ Shopping</label>
+                        <input type="number" id="shoppingBudget" name="shoppingBudget" placeholder="e.g., 1000" min="0">
+                    </div>
+                    
+                    <div class="category-card">
+                        <label for="billsBudget">💡 Bills & Utilities</label>
+                        <input type="number" id="billsBudget" name="billsBudget" placeholder="e.g., 2000" min="0">
+                    </div>
+                    
+                    <div class="category-card">
+                        <label for="healthcareBudget">🏥 Healthcare</label>
+                        <input type="number" id="healthcareBudget" name="healthcareBudget" placeholder="e.g., 500" min="0">
+                    </div>
+                    
+                    <div class="category-card">
+                        <label for="savingsBudget">💰 Savings</label>
+                        <input type="number" id="savingsBudget" name="savingsBudget" placeholder="e.g., 2000" min="0">
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-top: 2rem;">
+                    <label for="totalBudget">💎 Total Budget (Auto-calculated)</label>
+                    <input type="number" id="totalBudget" name="totalBudget" readonly style="background: #f8f9fa; font-weight: bold;">
+                </div>
+
+                <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                    <button type="submit" class="btn btn-success" style="flex: 1;">
+                        💾 Save Budget
+                    </button>
+                    <a href="/budgets" class="btn btn-outline" style="flex: 1; text-align: center;">
+                        📊 View Current Budgets
+                    </a>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <script>
+        // Auto-calculate total budget
+        function calculateTotal() {
+            const inputs = [
+                'foodBudget', 'transportBudget', 'entertainmentBudget', 
+                'educationBudget', 'shoppingBudget', 'billsBudget', 
+                'healthcareBudget', 'savingsBudget'
+            ];
+            
+            let total = 0;
+            inputs.forEach(id => {
+                const value = document.getElementById(id).value;
+                if (value) total += parseInt(value) || 0;
+            });
+            
+            document.getElementById('totalBudget').value = total;
+        }
+
+        // Add event listeners to all budget inputs
+        document.querySelectorAll('input[type="number"]').forEach(input => {
+            if (input.id !== 'totalBudget') {
+                input.addEventListener('input', calculateTotal);
+            }
+        });
+
+        // Apply AI Suggestions
+        function applyAISuggestions() {
+            document.getElementById('foodBudget').value = 1500;
+            document.getElementById('transportBudget').value = 1000;
+            document.getElementById('entertainmentBudget').value = 800;
+            document.getElementById('educationBudget').value = 1200;
+            document.getElementById('shoppingBudget').value = 1000;
+            document.getElementById('billsBudget').value = 1000;
+            document.getElementById('healthcareBudget').value = 500;
+            document.getElementById('savingsBudget').value = 2000;
+            
+            calculateTotal();
+            
+            alert('AI Budget Recommendations Applied! 🚀\nTotal Budget: ₹8,000');
+        }
+
+        // Initialize total calculation
+        document.addEventListener('DOMContentLoaded', calculateTotal);
+    </script>
+
+    <!-- ✅ STEP 3: BUDGET FORM SUBMISSION FIX -->
+    <!-- ✅ CORRECTED URL FOR PORT 4000 -->
+<script>
+    document.getElementById('budgetForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const month = parseInt(document.getElementById('month').value);
+        const year = parseInt(document.getElementById('year').value);
+        const monthlyIncome = parseInt(document.getElementById('monthlyIncome').value);
+
+        // ✅ CORRECT: Send data in proper format
+        const budgetData = {
+            month: month,
+            year: year,
+            monthlyIncome: monthlyIncome,
+            categories: {
+                food: { planned: parseInt(document.getElementById('foodBudget').value) || 0 },
+                transport: { planned: parseInt(document.getElementById('transportBudget').value) || 0 },
+                entertainment: { planned: parseInt(document.getElementById('entertainmentBudget').value) || 0 },
+                education: { planned: parseInt(document.getElementById('educationBudget').value) || 0 },
+                shopping: { planned: parseInt(document.getElementById('shoppingBudget').value) || 0 },
+                bills: { planned: parseInt(document.getElementById('billsBudget').value) || 0 },
+                healthcare: { planned: parseInt(document.getElementById('healthcareBudget').value) || 0 },
+                savings: { planned: parseInt(document.getElementById('savingsBudget').value) || 0 }
+            }
+        };
+
+        console.log('📤 Sending budget data:', budgetData);
+
+        try {
+            // ✅ USE CORRECT ENDPOINT FOR PORT 4000
+            const response = await fetch('/api/budgets/create', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(budgetData)
+            });
+            
+            console.log('📥 Response status:', response.status);
+            
+            const result = await response.json();
+            
+            if (response.ok) {
+                console.log('✅ Budget creation success:', result);
+                alert('✅ Budget successfully created!');
+                window.location.href = '/budgets';
+            } else {
+                console.error('❌ Server error:', result);
+                alert('❌ Error: ' + result.message);
+            }
+        } catch (error) {
+            console.error('🔴 Network error:', error);
+            alert('❌ Network error: Make sure server is running on port 4000');
+        }
+    });
+</script>
+        

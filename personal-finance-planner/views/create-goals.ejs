@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .goal-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            border: none;
+            margin-top: 2rem;
+        }
+        .goal-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 20px 20px 0 0;
+            padding: 2rem;
+            text-align: center;
+        }
+        .goal-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+        .form-control, .form-select {
+            border-radius: 10px;
+            padding: 12px 15px;
+            border: 2px solid #e9ecef;
+            transition: all 0.3s ease;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+        .btn-goal {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 50px;
+            padding: 12px 30px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .btn-goal:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light shadow-sm">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="/dashboard">
+                📈 Finance Planner
+            </a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="/dashboard">Dashboard</a>
+                <a class="nav-link" href="/goals">Goals</a>
+                <a class="nav-link" href="/transactions">Transactions</a>
+                <a class="nav-link" href="/budgets">Budgets</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container my-4">
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6">
+                <div class="goal-card">
+                    <!-- Header -->
+                    <div class="goal-header">
+                        <div class="goal-icon">🎯</div>
+                        <h1 class="h3 mb-2">Create New Goal</h1>
+                        <p class="mb-0 opacity-75">Set your financial target and track progress</p>
+                    </div>
+
+                    <!-- Form -->
+                    <div class="card-body p-4">
+                        <form action="/goals/create" method="POST">
+                            <!-- Goal Name -->
+                            <div class="mb-3">
+                                <label for="goalName" class="form-label fw-semibold">🎯 Goal Name</label>
+                                <input type="text" class="form-control" id="goalName" name="goalName" 
+                                       placeholder="e.g., Emergency Fund, Vacation, New Car" required>
+                                <div class="form-text">Give your goal a clear, motivating name</div>
+                            </div>
+
+                            <!-- Description -->
+                            <div class="mb-3">
+                                <label for="description" class="form-label fw-semibold">📝 Description (Optional)</label>
+                                <textarea class="form-control" id="description" name="description" 
+                                          rows="3" placeholder="Describe your goal... Why is it important to you?"></textarea>
+                            </div>
+
+                            <!-- Target Amount and Deadline -->
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="targetAmount" class="form-label fw-semibold">💰 Target Amount (₹)</label>
+                                    <input type="number" class="form-control" id="targetAmount" name="targetAmount" 
+                                           placeholder="50000" min="100" step="100" required>
+                                    <div class="form-text">Minimum ₹100</div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="deadline" class="form-label fw-semibold">📅 Deadline</label>
+                                    <input type="date" class="form-control" id="deadline" name="deadline" required>
+                                    <div class="form-text">Choose a realistic target date</div>
+                                </div>
+                            </div>
+
+                            <!-- Category -->
+                            <div class="mb-4">
+                                <label for="category" class="form-label fw-semibold">📂 Category</label>
+                                <select class="form-select" id="category" name="category">
+                                    <option value="emergency">🛡️ Emergency Fund</option>
+                                    <option value="vacation" selected>🏖️ Vacation</option>
+                                    <option value="vehicle">🚗 Vehicle</option>
+                                    <option value="home">🏠 Home</option>
+                                    <option value="education">🎓 Education</option>
+                                    <option value="investment">📈 Investment</option>
+                                    <option value="wedding">💍 Wedding</option>
+                                    <option value="gadgets">📱 Gadgets</option>
+                                    <option value="other">📦 Other</option>
+                                </select>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                <a href="/goals" class="btn btn-outline-secondary me-md-2">
+                                    📋 View Goals
+                                </a>
+                                <a href="/dashboard" class="btn btn-outline-primary me-md-2">
+                                    🏠 Dashboard
+                                </a>
+                                <button type="submit" class="btn btn-goal text-white">
+                                    🎯 Create Goal
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Tips Section -->
+                <div class="mt-4">
+                    <div class="alert alert-info border-0">
+                        <h6 class="alert-heading mb-3">💡 Goal Setting Tips</h6>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <ul class="mb-3 mb-md-0">
+                                    <li>Set realistic targets based on your income</li>
+                                    <li>Break large goals into smaller milestones</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <ul>
+                                    <li>Review your progress monthly</li>
+                                    <li>Celebrate when you reach milestones!</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Set minimum date to tomorrow
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        document.getElementById('deadline').min = tomorrow.toISOString().split('T')[0];
+        
+        // Set default date to 6 months from now
+        const sixMonthsLater = new Date();
+        sixMonthsLater.setMonth(sixMonthsLater.getMonth() + 6);
+        document.getElementById('deadline').value = sixMonthsLater.toISOString().split('T')[0];
+
+        // Set default target amount
+        document.getElementById('targetAmount').value = 50000;
+
+        // Input validation
+        document.getElementById('targetAmount').addEventListener('input', function(e) {
+            if (this.value < 100) {
+                this.value = 100;
+            }
+        });
+
+        // Form submission handler
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const goalName = document.getElementById('goalName').value.trim();
+            const targetAmount = document.getElementById('targetAmount').value;
+            const deadline = document.getElementById('deadline').value;
+            
+            if (!goalName) {
+                e.preventDefault();
+                alert('❌ Please enter a goal name!');
+                document.getElementById('goalName').focus();
+                return;
+            }
+            
+            if (!targetAmount || parseFloat(targetAmount) < 100) {
+                e.preventDefault();
+                alert('❌ Target amount must be at least ₹100');
+                document.getElementById('targetAmount').focus();
+                return;
+            }
+            
+            const selectedDate = new Date(deadline);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            if (selectedDate <= today) {
+                e.preventDefault();
+                alert('❌ Deadline must be a future date!');
+                document.getElementById('deadline').focus();
+                return;
+            }
+
+            // Show loading state
+            const submitBtn = document.querySelector('button[type="submit"]');
+            submitBtn.innerHTML = '⏳ Creating Goal...';
+            submitBtn.disabled = true;
+        });
+
+        // Add some interactivity
+        document.getElementById('goalName').focus();
+    </script>
+</body>
+</html>

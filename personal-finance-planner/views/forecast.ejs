@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <style>
+        /* Same styles as dashboard */
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a56d4;
+            --secondary: #7209b7;
+            --success: #4cc9f0;
+            --income: #27ae60;
+            --expense: #e74c3c;
+            --warning: #f39c12;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+            --border-radius: 10px;
+            --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: #f5f7fa;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+        
+        .navbar {
+            background: white;
+            box-shadow: var(--box-shadow);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .nav-container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .nav-logo {
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 1.5rem;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 0.7rem 1.5rem;
+            background: var(--primary);
+            color: white;
+            text-decoration: none;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+        
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 0;
+        }
+        
+        .card {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            box-shadow: var(--box-shadow);
+            margin-bottom: 2rem;
+        }
+        
+        .forecast-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        
+        .month-card {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            box-shadow: var(--box-shadow);
+            border-top: 4px solid var(--primary);
+        }
+        
+        .month-card.positive {
+            border-top-color: var(--income);
+        }
+        
+        .month-card.negative {
+            border-top-color: var(--expense);
+        }
+        
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            margin: 0.5rem 0;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .ai-recommendations {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            margin-top: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <h2 class="nav-logo">📈 Finance Planner</h2>
+            <div class="nav-links">
+                <span class="user-welcome">Welcome, <%= user.username %></span>
+                <a href="/dashboard" class="btn">← Back to Dashboard</a>
+            </div>
+        </div>
+    </nav>
+    
+    <main class="container">
+        <div class="card">
+            <h1>📅 6-Month Financial Forecast</h1>
+            <p>AI-powered projections based on your current spending patterns</p>
+            
+            <div class="forecast-summary" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin: 2rem 0;">
+                <div style="background: #e8f5e8; padding: 1.5rem; border-radius: 10px; text-align: center;">
+                    <div style="font-size: 0.9rem; color: #27ae60;">Total Projected Savings</div>
+                    <div style="font-size: 1.8rem; font-weight: bold; color: #27ae60;">₹<%= forecast.totalSavings.toLocaleString() %></div>
+                </div>
+                <div style="background: #e8f4fd; padding: 1.5rem; border-radius: 10px; text-align: center;">
+                    <div style="font-size: 0.9rem; color: #4361ee;">Avg Monthly Savings</div>
+                    <div style="font-size: 1.8rem; font-weight: bold; color: #4361ee;">₹<%= forecast.averageMonthlySavings.toLocaleString() %></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Monthly Projections</h2>
+            <div class="forecast-grid">
+                <% forecast.monthlyProjections.forEach(month => { %>
+                    <div class="month-card <%= month.savings >= 0 ? 'positive' : 'negative' %>">
+                        <h3 style="color: #2c3e50; margin-bottom: 1rem;"><%= month.month %></h3>
+                        <div class="stat-item">
+                            <span>Income:</span>
+                            <span style="color: #27ae60; font-weight: bold;">₹<%= month.income.toLocaleString() %></span>
+                        </div>
+                        <div class="stat-item">
+                            <span>Expenses:</span>
+                            <span style="color: #e74c3c; font-weight: bold;">₹<%= month.expense.toLocaleString() %></span>
+                        </div>
+                        <div class="stat-item">
+                            <span>Savings:</span>
+                            <span style="color: <%= month.savings >= 0 ? '#27ae60' : '#e74c3c' %>; font-weight: bold;">
+                                ₹<%= month.savings.toLocaleString() %>
+                            </span>
+                        </div>
+                    </div>
+                <% }); %>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="ai-recommendations">
+                <h3 style="color: white;">🤖 AI Financial Recommendations</h3>
+                <ul style="margin-top: 1rem; padding-left: 1.5rem;">
+                    <% forecast.recommendations.forEach(rec => { %>
+                        <li style="margin: 0.5rem 0;"><%= rec %></li>
+                    <% }); %>
+                </ul>
+                <div style="margin-top: 1.5rem; font-style: italic;">
+                    "Based on your current spending patterns and budget utilization"
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

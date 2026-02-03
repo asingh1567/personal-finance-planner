@@ -1,0 +1,702 @@
+<!-- transaction.ejs -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a56d4;
+            --secondary: #7209b7;
+            --success: #4cc9f0;
+            --income: #27ae60;
+            --expense: #e74c3c;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+            --border-radius: 10px;
+            --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: #f5f7fa;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+        
+        .navbar {
+            background: white;
+            box-shadow: var(--box-shadow);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .nav-container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .nav-logo {
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .nav-logo::before {
+            content: "📈";
+        }
+        
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .user-welcome {
+            color: var(--dark);
+            font-weight: 600;
+            margin-right: 0.5rem;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 0.7rem 1.5rem;
+            background: var(--primary);
+            color: white;
+            text-decoration: none;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            transition: var(--transition);
+            border: none;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        
+        .btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .btn-success {
+            background: var(--income);
+        }
+        
+        .btn-success:hover {
+            background: #219653;
+        }
+        
+        .btn-danger {
+            background: var(--expense);
+        }
+        
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+        
+        .btn-outline:hover {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-small {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.8rem;
+        }
+        
+        /* ACTION BUTTONS FIX - YEH NAYA CSS ADD KARO */
+        .actions-cell {
+            text-align: center;
+            white-space: nowrap;
+        }
+        
+        .btn-edit {
+            background: #f39c12;
+            color: white;
+            border: none;
+            padding: 0.4rem 0.8rem;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 0 2px;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+        }
+        
+        .btn-edit:hover {
+            background: #e67e22;
+            transform: scale(1.1);
+        }
+        
+        .btn-delete {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 0.4rem 0.8rem;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 0 2px;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+        }
+        
+        .btn-delete:hover {
+            background: #c0392b;
+            transform: scale(1.1);
+        }
+        
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 0;
+        }
+        
+        .hero {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            text-align: center;
+            margin-bottom: 2rem;
+            box-shadow: var(--box-shadow);
+        }
+        
+        .hero h1 {
+            font-size: 2.2rem;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+        
+        .hero p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .card {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            box-shadow: var(--box-shadow);
+            margin-bottom: 2rem;
+        }
+        
+        .page-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .transaction-filters {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .filter-select {
+            padding: 0.7rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            background: white;
+            font-size: 0.9rem;
+            min-width: 150px;
+        }
+        
+        .transaction-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .summary-card {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            box-shadow: var(--box-shadow);
+            text-align: center;
+            border-top: 4px solid var(--primary);
+        }
+        
+        .summary-card.income {
+            border-top-color: var(--income);
+        }
+        
+        .summary-card.expense {
+            border-top-color: var(--expense);
+        }
+        
+        .summary-card.net {
+            border-top-color: var(--secondary);
+        }
+        
+        .summary-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin: 0.5rem 0;
+        }
+        
+        .summary-label {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        
+        th {
+            background: #f8f9fa;
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 2px solid #e1e8ed;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid #e1e8ed;
+        }
+        
+        tr:hover {
+            background: #f8f9fa;
+            transform: scale(1.01);
+            transition: all 0.2s ease;
+        }
+        
+        .type-badge {
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .type-income {
+            background: rgba(39, 174, 96, 0.1);
+            color: var(--income);
+            border: 1px solid rgba(39, 174, 96, 0.3);
+        }
+        
+        .type-expense {
+            background: rgba(231, 76, 60, 0.1);
+            color: var(--expense);
+            border: 1px solid rgba(231, 76, 60, 0.3);
+        }
+        
+        .income-amount {
+            color: #27ae60;
+            font-weight: bold;
+        }
+        
+        .expense-amount {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        
+        .category-tag {
+            background: rgba(67, 97, 238, 0.1);
+            color: var(--primary);
+            padding: 0.3rem 0.6rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+        }
+        
+        .goal-badge {
+            background: rgba(114, 9, 183, 0.1);
+            color: var(--secondary);
+            padding: 0.3rem 0.6rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+        }
+        
+        .empty-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+        
+        .empty-state h3 {
+            color: var(--gray);
+            margin-bottom: 1rem;
+        }
+        
+        .empty-state p {
+            color: var(--gray);
+            margin-bottom: 1.5rem;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .transaction-count {
+            text-align: center;
+            margin-top: 1.5rem;
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        
+        .error-message {
+            background: rgba(231, 76, 60, 0.1);
+            color: var(--expense);
+            padding: 0.75rem;
+            border-radius: var(--border-radius);
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--expense);
+        }
+        
+        @media (max-width: 768px) {
+            .page-actions {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .action-buttons {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .transaction-filters {
+                width: 100%;
+            }
+            
+            .filter-select {
+                flex: 1;
+                min-width: unset;
+            }
+            
+            table {
+                font-size: 0.85rem;
+            }
+            
+            th, td {
+                padding: 0.75rem 0.5rem;
+            }
+            
+            .btn-edit, .btn-delete {
+                padding: 0.3rem 0.5rem;
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <h2 class="nav-logo">Finance Planner</h2>
+            <div class="nav-links">
+                <span class="user-welcome">Welcome, <%= user.username %></span>
+                <a href="/dashboard" class="btn">Dashboard</a>
+                <a href="/transactions" class="btn">Transactions</a>
+                <a href="/goals" class="btn">Goals</a>
+                <a href="/logout" class="btn btn-outline">Logout</a>
+            </div>
+        </div>
+    </nav>
+    
+    <main class="container">
+        <div class="hero">
+            <h1>Transaction History</h1>
+            <p>Track your spending and income to better plan your financial future</p>
+        </div>
+        
+        <!-- CALCULATIONS SECTION -->
+        <% 
+            let totalIncome = 0;
+            let totalExpenses = 0;
+            let netBalance = 0;
+            
+            if (transactions && transactions.length > 0) {
+                transactions.forEach(transaction => {
+                    if (transaction.type === 'income') {
+                        totalIncome += transaction.amount;
+                    } else if (transaction.type === 'expense') {
+                        totalExpenses += transaction.amount;
+                    }
+                });
+                netBalance = totalIncome - totalExpenses;
+            }
+        %>
+        
+        <div class="transaction-summary">
+            <div class="summary-card income">
+                <div class="summary-label">Total Income</div>
+                <div class="summary-value">₹<%= totalIncome.toLocaleString() %></div>
+                <div class="summary-label">This Month</div>
+            </div>
+            <div class="summary-card expense">
+                <div class="summary-label">Total Expenses</div>
+                <div class="summary-value">₹<%= totalExpenses.toLocaleString() %></div>
+                <div class="summary-label">This Month</div>
+            </div>
+            <div class="summary-card net">
+                <div class="summary-label">Net Balance</div>
+                <div class="summary-value">₹<%= netBalance.toLocaleString() %></div>
+                <div class="summary-label">This Month</div>
+            </div>
+        </div>
+        
+        <div class="page-actions">
+            <div class="action-buttons">
+                <a href="/transactions/add?type=income" class="btn btn-success">+ Add Income</a>
+                <a href="/transactions/add?type=expense" class="btn btn-danger">+ Add Expense</a>
+                <!-- <a href="/transactions/plan" class="btn btn-outline">Plan Future Transaction</a> -------------->
+            </div>
+            <a href="/dashboard" class="btn">Back to Dashboard</a>
+        </div>
+        
+        <div class="transaction-filters">
+    <form method="GET" action="/transactions" id="filterForm">
+        <select class="filter-select" name="type" onchange="this.form.submit()">
+            <option value="all" <%= currentFilters.type === 'all' ? 'selected' : '' %>>All Types</option>
+            <option value="income" <%= currentFilters.type === 'income' ? 'selected' : '' %>>Income Only</option>
+            <option value="expense" <%= currentFilters.type === 'expense' ? 'selected' : '' %>>Expenses Only</option>
+        </select>
+        
+        <select class="filter-select" name="category" onchange="this.form.submit()">
+            <option value="all" <%= currentFilters.category === 'all' ? 'selected' : '' %>>All Categories</option>
+            <% availableCategories.forEach(cat => { %>
+                <option value="<%= cat %>" <%= currentFilters.category === cat ? 'selected' : '' %>>
+                    <%= cat %>
+                </option>
+            <% }) %>
+        </select>
+        
+        <select class="filter-select" name="month" onchange="this.form.submit()">
+            <option value="all" <%= currentFilters.month === 'all' ? 'selected' : '' %>>All Time</option>
+            <option value="current" <%= currentFilters.month === 'current' ? 'selected' : '' %>>Current Month</option>
+            <option value="last" <%= currentFilters.month === 'last' ? 'selected' : '' %>>Last Month</option>
+            <option value="last3" <%= currentFilters.month === 'last3' ? 'selected' : '' %>>Last 3 Months</option>
+        </select>
+        
+        <!-- Clear Filters Button -->
+        <a href="/transactions" class="btn btn-outline" style="margin-left: 10px;">Clear Filters</a>
+    </form>
+</div>
+        
+        <div class="card">
+            <% if (transactions && transactions.length > 0) { %>
+                <div style="overflow-x: auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Description</th>
+                                <th>Category</th>
+                                <th>Amount</th>
+                                <th>Type</th>
+                                <th class="actions-cell">Actions</th>  <!-- Class add kiya -->
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% transactions.forEach(transaction => { 
+                                // Better descriptions ke liye mapping
+                                let description = transaction.description;
+                                if (!description || description === 'No description') {
+                                    switch(transaction.category) {
+                                        case 'Food':
+                                            description = 'Weekly Groceries';
+                                            break;
+                                        case 'Travel':
+                                            description = 'Bus & Metro Pass';
+                                            break;
+                                        case 'Bills':
+                                            description = 'Hostel Room Rent';
+                                            break;
+                                        case 'Other Income':
+                                            description = 'Monthly Allowance';
+                                            break;
+                                        case 'Education':
+                                            description = 'Educational Material';
+                                            break;
+                                        default:
+                                            description = 'General Expense';
+                                    }
+                                }
+                            %>
+                                <tr>
+                                    <td><%= transaction.date.toLocaleDateString() %></td>
+                                    <td><%= description %></td>
+                                    <td>
+                                        <span class="category-tag"><%= transaction.category %></span>
+                                    </td>
+                                    <td class="<%= transaction.type === 'income' ? 'income-amount' : 'expense-amount' %>">
+                                        <%= transaction.type === 'income' ? '+' : '-' %>₹<%= transaction.amount.toLocaleString() %>
+                                    </td>
+                                    <td>
+                                        <span class="type-badge <%= transaction.type === 'income' ? 'type-income' : 'type-expense' %>">
+                                            <%= transaction.type === 'income' ? 'Income' : 'Expense' %>
+                                        </span>
+                                    </td>
+                                    <!-- RELATED GOAL COLUMN COMPLETELY REMOVED -->
+                                    <td class="actions-cell">  <!-- Class add kiya -->
+                                        <button class="btn-edit" onclick="editTransaction('<%= transaction.id %>')">✏️</button>
+                                        <button class="btn-delete" onclick="deleteTransaction('<%= transaction.id %>')">🗑️</button>
+                                    </td>
+                                </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="transaction-count">
+                    Total: <%= transactions.length %> transactions
+                </div>
+            <% } else { %>
+                <div class="empty-state">
+                    <div class="empty-icon">💸</div>
+                    <h3>No transactions found</h3>
+                    <p>Start planning your finances by adding your first transaction. Track your income and expenses to better understand your financial habits.</p>
+                    <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 1.5rem;">
+                        <a href="/transactions/add?type=income" class="btn btn-success">Add Income</a>
+                        <a href="/transactions/add?type=expense" class="btn btn-danger">Add Expense</a>
+                    </div>
+                </div>
+            <% } %>
+        </div>
+    </main>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+    // Populate categories dropdown
+    const categorySelect = document.querySelector('select[name="category"]');
+    const availableCategories = [
+        'Other Income', 'Food', 'Transport', 'Entertainment', 
+        'Shopping', 'Bills', 'Healthcare', 'Education', 'Other'
+    ];
+    
+    if (categorySelect) {
+        // Clear existing options except "All Categories"
+        while (categorySelect.children.length > 1) {
+            categorySelect.removeChild(categorySelect.lastChild);
+        }
+        
+        // Add category options
+        availableCategories.forEach(category => {
+            const option = document.createElement('option');
+            option.value = category;
+            option.textContent = category;
+            categorySelect.appendChild(option);
+        });
+    }
+
+    // Set current filter values from URL parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    const typeFilter = urlParams.get('type');
+    const categoryFilter = urlParams.get('category');
+    const monthFilter = urlParams.get('month');
+    
+    if (typeFilter) {
+        const typeSelect = document.querySelector('select[name="type"]');
+        if (typeSelect) typeSelect.value = typeFilter;
+    }
+    
+    if (categoryFilter) {
+        const categorySelect = document.querySelector('select[name="category"]');
+        if (categorySelect) categorySelect.value = categoryFilter;
+    }
+    
+    if (monthFilter) {
+        const monthSelect = document.querySelector('select[name="month"]');
+        if (monthSelect) monthSelect.value = monthFilter;
+    }
+
+    // Add animation to transaction rows
+    const rows = document.querySelectorAll('tbody tr');
+    rows.forEach((row, index) => {
+        row.style.opacity = '0';
+        row.style.transform = 'translateX(-20px)';
+        row.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+        
+        setTimeout(() => {
+            row.style.opacity = '1';
+            row.style.transform = 'translateX(0)';
+        }, 100 * index);
+    });
+});
+
+        // ✅ UPDATED: Edit and Delete functions - WORKING VERSION
+function editTransaction(transactionId) {
+    // Redirect to edit page
+    window.location.href = `/transactions/edit/${transactionId}`;
+}
+
+function deleteTransaction(transactionId) {
+    if (confirm("Are you sure you want to delete this transaction?\n\nThis action cannot be undone!")) {
+        // Show loading
+        const deleteBtn = event.target;
+        const originalText = deleteBtn.innerHTML;
+        deleteBtn.innerHTML = 'Deleting...';
+        deleteBtn.disabled = true;
+        
+        // Send DELETE request to server
+        fetch(`/transactions/delete/${transactionId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('✅ Transaction successfully deleted!');
+                // Reload the page to see updated list
+                window.location.reload();
+            } else {
+                alert('❌ Error: ' + data.message);
+                deleteBtn.innerHTML = originalText;
+                deleteBtn.disabled = false;
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('❌ Error deleting transaction');
+            deleteBtn.innerHTML = originalText;
+            deleteBtn.disabled = false;
+        });
+    }
+}
+    </script>
+</body>
+</html>

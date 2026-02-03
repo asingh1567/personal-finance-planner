@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 0; 
+            padding: 20px; 
+            background: #f5f7fa; 
+        }
+        .navbar { 
+            background: white; 
+            padding: 1rem 2rem; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        .container { 
+            max-width: 1000px; 
+            margin: 0 auto; 
+        }
+        .header { 
+            background: white; 
+            padding: 2rem; 
+            border-radius: 10px; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        .btn { 
+            background: #4361ee; 
+            color: white; 
+            padding: 12px 24px; 
+            text-decoration: none; 
+            border-radius: 5px; 
+            display: inline-block;
+            margin: 0.5rem;
+        }
+        .goals-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+        .goal-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-left: 4px solid #4361ee;
+        }
+        .progress-bar {
+            background: #ddd;
+            height: 10px;
+            border-radius: 5px;
+            margin: 0.5rem 0;
+            overflow: hidden;
+        }
+        .progress {
+            background: #4361ee;
+            height: 100%;
+            border-radius: 5px;
+            transition: width 0.3s ease;
+        }
+        .category-icon {
+            font-size: 1.5rem;
+            margin-right: 0.5rem;
+        }
+        .delete-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .delete-btn:hover {
+            background: #c82333;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <h2>📈 Finance Planner</h2>
+        <div>
+            <a href="/dashboard" class="btn">Dashboard</a>
+            <a href="/goals/create" class="btn" style="background: #7209b7;">Create Goal</a>
+        </div>
+    </nav>
+    
+    <main class="container">
+        <div class="header">
+            <h1>🎯 Your Financial Goals</h1>
+            <p>Track your progress towards achieving your financial targets</p>
+            
+            <!-- Summary Stats -->
+            <div style="display: flex; justify-content: center; gap: 2rem; margin-top: 1rem;">
+                <div style="text-align: center;">
+                    <h3 style="margin: 0; color: #4361ee;">₹<%= totalSaved.toLocaleString() %></h3>
+                    <small>Total Saved</small>
+                </div>
+                <div style="text-align: center;">
+                    <h3 style="margin: 0; color: #7209b7;">₹<%= totalTarget.toLocaleString() %></h3>
+                    <small>Total Target</small>
+                </div>
+                <div style="text-align: center;">
+                    <h3 style="margin: 0; color: #4CAF50;"><%= overallProgress %>%</h3>
+                    <small>Overall Progress</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dynamic Goals from Database -->
+        <div class="goals-grid">
+            <% if (goals && goals.length > 0) { %>
+                <% goals.forEach(goal => { 
+                    const progress = goal.targetAmount > 0 ? Math.round((goal.currentAmount / goal.targetAmount) * 100) : 0;
+                    const progressColor = progress >= 100 ? '#4CAF50' : progress >= 50 ? '#FF9800' : '#4361ee';
+                %>
+                    <div class="goal-card">
+                        <h3>
+                            <span class="category-icon">
+                                <%= typeof getCategoryIcon === 'function' ? getCategoryIcon(goal.category) : '🎯' %>
+                            </span>
+                            <%= goal.name %>
+                        </h3>
+                        <p><strong>Target:</strong> ₹<%= goal.targetAmount.toLocaleString() %></p>
+                        <p><strong>Deadline:</strong> <%= new Date(goal.deadline).toLocaleDateString() %></p>
+                        
+                        <div class="progress-bar">
+                            <div class="progress" style="width: <%= progress %>%; background: <%= progressColor %>"></div>
+                        </div>
+                        
+                        <p><strong>Progress:</strong> <%= progress %>% (₹<%= goal.currentAmount.toLocaleString() %> saved)</p>
+                        <p><strong>Remaining:</strong> ₹<%= (goal.targetAmount - goal.currentAmount).toLocaleString() %></p>
+                        
+                        <!-- Days Left -->
+                        <% 
+                            const today = new Date();
+                            const deadline = new Date(goal.deadline);
+                            const daysLeft = Math.ceil((deadline - today) / (1000 * 60 * 60 * 24));
+                        %>
+                        <p><strong>Time Left:</strong> <%= daysLeft > 0 ? daysLeft + ' days' : 'Deadline passed' %></p>
+
+                        <!-- Delete Button -->
+                        <div style="margin-top: 1rem; text-align: center;">
+                            <form action="/goals/<%= goal._id %>/delete" method="POST" style="display: inline;">
+                                <button type="submit" 
+                                        onclick="return confirm('Are you sure you want to delete <%= goal.name %>?')"
+                                        class="delete-btn">
+                                    🗑️ Delete Goal
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                <% }); %>
+            <% } else { %>
+                <div class="goal-card" style="text-align: center; grid-column: 1 / -1;">
+                    <h3>🎯 No Goals Yet</h3>
+                    <p>Start by creating your first financial goal!</p>
+                    <a href="/goals/create" class="btn">Create Your First Goal</a>
+                </div>
+            <% } %>
+        </div>
+
+        <!-- Debug Info (Remove in production) -->
+        <div style="margin-top: 2rem; padding: 1rem; background: #fff3cd; border-radius: 5px;">
+            <small><strong>Debug Info:</strong> <%= goals ? goals.length : 0 %> goals loaded from database</small>
+        </div>
+    </main>
+</body>
+</html>

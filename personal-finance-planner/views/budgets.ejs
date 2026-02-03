@@ -1,0 +1,160 @@
+<!-- views/budgets.ejs -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #f5f7fa; }
+        .navbar { background: white; padding: 1rem; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+        .card { background: white; padding: 2rem; margin-bottom: 2rem; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .btn { background: #4361ee; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block; border: none; cursor: pointer; }
+        
+        /* NEW STYLES FOR RECENT BUDGET */
+        .recent-budget-section { background: #e8f4fd; padding: 1.5rem; border-radius: 10px; margin-bottom: 2rem; border-left: 5px solid #4361ee; }
+        .recent-budget-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+        .budget-status { padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; }
+        .status-active { background: #d4edda; color: #155724; }
+        .status-inactive { background: #f8d7da; color: #721c24; }
+        .budget-progress { background: #e9ecef; border-radius: 10px; height: 10px; margin: 10px 0; }
+        .progress-bar { background: #4361ee; height: 100%; border-radius: 10px; transition: width 0.3s; }
+        .budget-stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin: 1rem 0; }
+        .stat-item { text-align: center; padding: 10px; background: white; border-radius: 8px; }
+        
+        /* Quick Actions */
+        .quick-actions { display: flex; gap: 10px; margin-top: 15px; }
+        .btn-view { background: #7209b7; }
+        .btn-edit { background: #f39c12; }
+        .btn-create { background: #27ae60; }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <h2>📈 Finance Planner</h2>
+        <div>
+            <a href="/dashboard" class="btn">Dashboard</a>
+            <a href="/budgets" class="btn">Budgets</a>
+        </div>
+    </nav>
+    
+    <main class="container">
+        <!-- ✅ NEW: RECENT BUDGET SECTION -->
+        <div class="recent-budget-section">
+            <div class="recent-budget-header">
+                <h2 style="margin: 0; color: #4361ee;">📊 Current Budget Overview</h2>
+                <% if (currentBudget) { %>
+                    <span class="budget-status status-active">ACTIVE</span>
+                <% } else { %>
+                    <span class="budget-status status-inactive">NOT SET</span>
+                <% } %>
+            </div>
+            
+            <% if (currentBudget) { %>
+                <div class="current-budget-content">
+                    <h3 style="margin: 0 0 10px 0;"><%= currentBudget.monthName %> <%= currentBudget.year %></h3>
+                    
+                    <div class="budget-stats">
+                        <div class="stat-item">
+                            <small>Total Budget</small>
+                            <div style="font-weight: bold; color: #4361ee;">₹<%= currentBudget.totalPlanned %></div>
+                        </div>
+                        <div class="stat-item">
+                            <small>Total Spent</small>
+                            <div style="font-weight: bold; color: #e74c3c;">₹<%= currentBudget.totalSpent %></div>
+                        </div>
+                        <div class="stat-item">
+                            <small>Remaining</small>
+                            <div style="font-weight: bold; color: #27ae60;">₹<%= currentBudget.totalPlanned - currentBudget.totalSpent %></div>
+                        </div>
+                        <div class="stat-item">
+                            <small>Utilization</small>
+                            <div style="font-weight: bold; color: #f39c12;">
+                                <%= Math.min(Math.round((currentBudget.totalSpent / currentBudget.totalPlanned) * 100), 100) %>%
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="budget-progress">
+                        <div class="progress-bar" 
+                             style="width: <%= Math.min((currentBudget.totalSpent / currentBudget.totalPlanned) * 100, 100) %>%">
+                        </div>
+                    </div>
+                    
+                    <div class="quick-actions">
+                        <a href="/budget/view?month=<%= currentBudget.month %>&year=<%= currentBudget.year %>" 
+                           class="btn btn-view">👁️ View Details</a>
+                        <a href="/budgets/set" class="btn btn-edit">✏️ Edit Budget</a>
+                    </div>
+                </div>
+            <% } else { %>
+                <div class="no-budget-content">
+                    <p style="margin: 0 0 15px 0; color: #666;">
+                        📝 No budget set for current month. Create your first budget to start tracking your expenses!
+                    </p>
+                    <a href="/budgets/set" class="btn btn-create">💰 Create Budget</a>
+                </div>
+            <% } %>
+        </div>
+
+        <div class="card">
+            <h1>💰 Budget Planning</h1>
+            <p>Your budget management dashboard</p>
+            
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin: 2rem 0;">
+                <div style="text-align: center; padding: 1rem; background: #e8f4fd; border-radius: 8px;">
+                    <h3>Total Budget</h3>
+                    <div style="font-size: 1.5rem; font-weight: bold; color: #3498db;">₹<%= totalBudget %></div>
+                </div>
+                <div style="text-align: center; padding: 1rem; background: #ffeaea; border-radius: 8px;">
+                    <h3>Total Spent</h3>
+                    <div style="font-size: 1.5rem; font-weight: bold; color: #e74c3c;">₹<%= totalSpent %></div>
+                </div>
+                <div style="text-align: center; padding: 1rem; background: #e8f5e8; border-radius: 8px;">
+                    <h3>Remaining</h3>
+                    <div style="font-size: 1.5rem; font-weight: bold; color: #27ae60;">₹<%= remaining %></div>
+                </div>
+                <!-- views/budgets.ejs में utilization display fix करें -->
+<div style="text-align: center; padding: 1rem; background: #fff3cd; border-radius: 8px;">
+    <h3>Utilization</h3>
+    <div style="font-size: 1.5rem; font-weight: bold; color: #f39c12;">
+        <%= isNaN(utilization) ? '0%' : utilization + '%' %>
+    </div>
+</div>
+            </div>
+
+            <div style="display: flex; gap: 1rem; margin: 2rem 0;">
+                <a href="/budgets/set" class="btn" style="background: #7209b7;">Set New Budget</a>
+                <a href="/forecast" class="btn">View Forecast</a>
+                <a href="/budgets/link-goals" class="btn">Link Goals</a>
+                <a href="/dashboard" class="btn" style="background: #6c757d;">Back to Dashboard</a>
+            </div>
+
+            <h2>Your Budgets</h2>
+            <table style="width: 100%; border-collapse: collapse; margin-top: 1rem;">
+                <thead>
+                    <tr style="background: #f8f9fa;">
+                        <th style="padding: 1rem; text-align: left;">Category</th>
+                        <th style="padding: 1rem; text-align: left;">Budget</th>
+                        <th style="padding: 1rem; text-align: left;">Spent</th>
+                        <th style="padding: 1rem; text-align: left;">Remaining</th>
+                        <th style="padding: 1rem; text-align: left;">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% budgets.forEach(budget => { %>
+                    <tr>
+                        <td style="padding: 1rem; border-bottom: 1px solid #ddd;"><%= budget.category %></td>
+                        <td style="padding: 1rem; border-bottom: 1px solid #ddd;">₹<%= budget.budget %></td>
+                        <td style="padding: 1rem; border-bottom: 1px solid #ddd;">₹<%= budget.spent %></td>
+                        <td style="padding: 1rem; border-bottom: 1px solid #ddd; color: <%= budget.remaining >= 0 ? '#27ae60' : '#e74c3c' %>;">₹<%= budget.remaining %></td>
+                        <td style="padding: 1rem; border-bottom: 1px solid #ddd; color: <%= budget.status === 'On Track' ? '#27ae60' : '#e74c3c' %>;"><%= budget.status %></td>
+                    </tr>
+                    <% }); %>
+                </tbody>
+            </table>
+        </div>
+    </main>
+</body>
+</html>

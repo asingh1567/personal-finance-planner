@@ -1,0 +1,358 @@
+<!-- views/plan-transaction.ejs -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <style>
+        /* Same CSS as transaction.ejs - copy paste karo */
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a56d4;
+            --secondary: #7209b7;
+            --success: #4cc9f0;
+            --income: #27ae60;
+            --expense: #e74c3c;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+            --border-radius: 10px;
+            --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: #f5f7fa;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+        
+        .navbar {
+            background: white;
+            box-shadow: var(--box-shadow);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .nav-container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .nav-logo {
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .nav-logo::before {
+            content: "📈";
+        }
+        
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .user-welcome {
+            color: var(--dark);
+            font-weight: 600;
+            margin-right: 0.5rem;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 0.7rem 1.5rem;
+            background: var(--primary);
+            color: white;
+            text-decoration: none;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            transition: var(--transition);
+            border: none;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        
+        .btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .btn-success {
+            background: var(--income);
+        }
+        
+        .btn-success:hover {
+            background: #219653;
+        }
+        
+        .btn-danger {
+            background: var(--expense);
+        }
+        
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+        
+        .btn-outline:hover {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .container {
+            width: 90%;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 2rem 0;
+        }
+        
+        .hero {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            text-align: center;
+            margin-bottom: 2rem;
+            box-shadow: var(--box-shadow);
+        }
+        
+        .hero h1 {
+            font-size: 2.2rem;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+        
+        .hero p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .card {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            box-shadow: var(--box-shadow);
+            margin-bottom: 2rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .form-input, .form-select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+        
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+        }
+        
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 2rem;
+        }
+        
+        .type-selector {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .type-option {
+            flex: 1;
+            text-align: center;
+            padding: 1rem;
+            border: 2px solid #ddd;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .type-option.selected {
+            border-color: var(--primary);
+            background: rgba(67, 97, 238, 0.1);
+        }
+        
+        .type-option.income.selected {
+            border-color: var(--income);
+            background: rgba(39, 174, 96, 0.1);
+        }
+        
+        .type-option.expense.selected {
+            border-color: var(--expense);
+            background: rgba(231, 76, 60, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <h2 class="nav-logo">Finance Planner</h2>
+            <div class="nav-links">
+                <span class="user-welcome">Welcome, <%= user.username %></span>
+                <a href="/dashboard" class="btn">Dashboard</a>
+                <a href="/transactions" class="btn">Transactions</a>
+                <a href="/goals" class="btn">Goals</a>
+                <a href="/logout" class="btn btn-outline">Logout</a>
+            </div>
+        </div>
+    </nav>
+    
+    <main class="container">
+        <div class="hero">
+            <h1>Plan Future Transaction</h1>
+            <p>Schedule your income and expenses for better financial planning</p>
+        </div>
+        
+        <div class="card">
+            <form action="/transactions/plan" method="POST">
+                <div class="type-selector">
+                    <div class="type-option income selected" data-type="income" onclick="selectType('income')">
+                        <h3>💰 Income</h3>
+                        <p>Money coming in</p>
+                    </div>
+                    <div class="type-option expense" data-type="expense" onclick="selectType('expense')">
+                        <h3>💸 Expense</h3>
+                        <p>Money going out</p>
+                    </div>
+                </div>
+                <input type="hidden" name="type" id="transactionType" value="income">
+                
+                <div class="form-group">
+                    <label class="form-label" for="description">Description</label>
+                    <input type="text" class="form-input" id="description" name="description" 
+                           placeholder="e.g., Salary, Rent, Groceries..." required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="category">Category</label>
+                    <select class="form-select" id="category" name="category" required>
+                        <option value="">Select Category</option>
+                        <option value="Other Income">Other Income</option>
+                        <option value="Salary">Salary</option>
+                        <option value="Food">Food & Dining</option>
+                        <option value="Travel">Travel</option>
+                        <option value="Bills">Bills & Utilities</option>
+                        <option value="Entertainment">Entertainment</option>
+                        <option value="Shopping">Shopping</option>
+                        <option value="Education">Education</option>
+                        <option value="Healthcare">Healthcare</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="amount">Amount (₹)</label>
+                    <input type="number" class="form-input" id="amount" name="amount" 
+                           placeholder="0.00" min="0" step="0.01" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="scheduledDate">Scheduled Date</label>
+                    <input type="date" class="form-input" id="scheduledDate" name="scheduledDate" 
+                           min="<%= new Date().toISOString().split('T')[0] %>" required>
+                </div>
+                
+                <div class="form-actions">
+                    <a href="/transactions" class="btn btn-outline">Cancel</a>
+                    <button type="submit" class="btn btn-success">Plan Transaction</button>
+                </div>
+            </form>
+        </div>
+    </main>
+    
+    <script>
+        function selectType(type) {
+            document.getElementById('transactionType').value = type;
+            
+            // Update UI
+            document.querySelectorAll('.type-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            document.querySelector(`.type-option[data-type="${type}"]`).classList.add('selected');
+            
+            // Update category options based on type
+            updateCategories(type);
+        }
+        
+        function updateCategories(type) {
+            const categorySelect = document.getElementById('category');
+            const currentValue = categorySelect.value;
+            
+            if (type === 'income') {
+                // Income categories
+                categorySelect.innerHTML = `
+                    <option value="">Select Category</option>
+                    <option value="Salary">Salary</option>
+                    <option value="Other Income">Other Income</option>
+                    <option value="Freelance">Freelance</option>
+                    <option value="Investment">Investment</option>
+                    <option value="Bonus">Bonus</option>
+                `;
+            } else {
+                // Expense categories
+                categorySelect.innerHTML = `
+                    <option value="">Select Category</option>
+                    <option value="Food">Food & Dining</option>
+                    <option value="Travel">Travel</option>
+                    <option value="Bills">Bills & Utilities</option>
+                    <option value="Entertainment">Entertainment</option>
+                    <option value="Shopping">Shopping</option>
+                    <option value="Education">Education</option>
+                    <option value="Healthcare">Healthcare</option>
+                    <option value="Rent">Rent</option>
+                `;
+            }
+            
+            // Restore previous value if it exists in new options
+            if (currentValue) {
+                categorySelect.value = currentValue;
+            }
+        }
+        
+        // Set minimum date to today
+        document.getElementById('scheduledDate').min = new Date().toISOString().split('T')[0];
+    </script>
+</body>
+</html>

@@ -1,0 +1,536 @@
+<!-- view/dashboard.ejs -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a56d4;
+            --secondary: #7209b7;
+            --success: #28a745;
+            --danger: #dc3545;
+            --warning: #ffc107;
+            --info: #17a2b8;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+            --border-radius: 10px;
+            --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: var(--dark);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* Navbar */
+        .navbar {
+            background: white;
+            box-shadow: var(--box-shadow);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-logo {
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-block;
+            padding: 0.7rem 1.5rem;
+            background: var(--primary);
+            color: white;
+            text-decoration: none;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            transition: var(--transition);
+            border: none;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-success {
+            background: var(--success);
+        }
+
+        .btn-success:hover {
+            background: #218838;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .btn-warning {
+            background: var(--warning);
+            color: var(--dark);
+        }
+
+        .btn-warning:hover {
+            background: #e0a800;
+        }
+
+        .btn-info {
+            background: var(--info);
+        }
+
+        .btn-info:hover {
+            background: #138496;
+        }
+
+        .btn-secondary {
+            background: var(--secondary);
+        }
+
+        .btn-secondary:hover {
+            background: #6509a3;
+        }
+
+        /* Container */
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 0;
+        }
+
+        /* Dashboard Header */
+        .dashboard-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            margin-bottom: 2rem;
+            box-shadow: var(--box-shadow);
+        }
+
+        .dashboard-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .dashboard-header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        /* Financial Summary */
+        .financial-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            text-align: center;
+            transition: var(--transition);
+            border-left: 4px solid var(--primary);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-card h3 {
+            color: var(--gray);
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .stat-card p {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-card small {
+            color: var(--gray);
+            font-size: 0.8rem;
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
+        }
+
+        .quick-actions .btn {
+            flex: 1;
+            min-width: 150px;
+            text-align: center;
+        }
+
+        /* AI Insights */
+        .ai-insights {
+            background: white;
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            margin-bottom: 2rem;
+            border-left: 4px solid var(--info);
+        }
+
+        .ai-insights h3 {
+            color: var(--info);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        /* ✅ ADD THESE LINES - TEXT COLOR FIX */
+.ai-insights p,
+.ai-insights strong,
+.ai-insights small {
+    color: var(--dark) !important; /* Text को dark color दें */
+}
+
+.ai-analysis p, 
+.ai-recommendations p {
+    margin-bottom: 0.5rem;
+    color: var(--dark) !important; /* Specific text color */
+}
+
+        .ai-analysis, .ai-recommendations {
+            margin-bottom: 1.5rem;
+        }
+
+        .ai-analysis p, .ai-recommendations p {
+            margin-bottom: 0.5rem;
+        }
+
+        /* Budget Status */
+        .budget-status {
+            background: white;
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            margin-bottom: 2rem;
+            border-left: 4px solid var(--warning);
+        }
+
+        .budget-status h3 {
+            color: var(--warning);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .budget-category {
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            border-radius: 5px;
+            background: var(--light);
+        }
+
+        .budget-category.normal {
+            border-left: 4px solid var(--success);
+        }
+
+        .budget-category.warning {
+            border-left: 4px solid var(--warning);
+        }
+
+        .budget-category.exceeded {
+            border-left: 4px solid var(--danger);
+        }
+
+        /* Recent Transactions */
+        .recent-transactions {
+            background: white;
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+        }
+
+        .recent-transactions h3 {
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* ✅ IMPROVED RECENT TRANSACTIONS */
+.recent-transactions {
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    padding: 2rem;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    border: 1px solid #e1e8ed;
+}
+
+.recent-transactions h3 {
+    color: var(--primary);
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.3rem;
+    border-bottom: 2px solid var(--primary);
+    padding-bottom: 0.5rem;
+}
+
+.recent-transactions .transaction-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    border-bottom: 1px solid #e1e8ed;
+    transition: var(--transition);
+    background: white;
+    margin-bottom: 0.5rem;
+    border-radius: 8px;
+    border-left: 4px solid transparent;
+}
+
+.recent-transactions .transaction-item:hover {
+    background: #f8f9fa;
+    transform: translateX(5px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.recent-transactions .transaction-item.income {
+    border-left-color: var(--success);
+}
+
+.recent-transactions .transaction-item.expense {
+    border-left-color: var(--danger);
+}
+
+.recent-transactions .transaction-item:last-child {
+    border-bottom: none;
+}
+
+.recent-transactions .transaction-item strong {
+    color: var(--dark);
+    font-size: 1rem;
+    display: block;
+    margin-bottom: 0.25rem;
+}
+
+.recent-transactions .transaction-item small {
+    color: var(--gray);
+    font-size: 0.85rem;
+}
+
+.transaction-amount.income {
+    color: var(--success) !important;
+    font-weight: 700;
+    font-size: 1.1rem;
+    background: rgba(40, 167, 69, 0.1);
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+}
+
+.transaction-amount.expense {
+    color: var(--danger) !important;
+    font-weight: 700;
+    font-size: 1.1rem;
+    background: rgba(220, 53, 69, 0.1);
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+}
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .financial-summary {
+                grid-template-columns: 1fr;
+            }
+            
+            .quick-actions {
+                flex-direction: column;
+            }
+            
+            .nav-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .dashboard-header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <h2 class="nav-logo">💰 Finance Planner</h2>
+            <div class="nav-links">
+                <span>Welcome, <%= user.username %></span>
+                <a href="/dashboard" class="btn">Dashboard</a>
+                <a href="/logout" class="btn btn-secondary">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container">
+        <div class="dashboard-header">
+            <h1>Financial Dashboard</h1>
+            <p>Plan your financial future, track progress, and achieve your goals</p>
+            <div class="dashboard-header">
+    <!-- <h1>Financial Dashboard</h1> -->
+    
+    <!-- ✅ YAHAN ADD KAREN -->
+    <!-- <div class="action-buttons" style="display: flex; gap: 10px; margin: 20px 0; flex-wrap: wrap;">
+        <a href="/add-income" class="btn btn-success">💰 Add Income</a>
+        <a href="/add-expense" class="btn btn-danger">💸 Add Expense</a>
+        <a href="/transactions" class="btn">📋 All Transactions</a>
+    </div>
+</div> -->
+        </div>
+
+        <!-- Real Financial Summary -->
+        <div class="financial-summary">
+            <div class="stat-card">
+                <h3>Total Income</h3>
+                <p>₹<%= totalIncome %></p>
+                <small>This Month</small>
+            </div>
+            <div class="stat-card">
+                <h3>Total Expenses</h3>
+                <p>₹<%= totalExpense %></p>
+                <small>This Month</small>
+            </div>
+            <div class="stat-card">
+                <h3>Current Balance</h3>
+                <p>₹<%= balance %></p>
+                <small>This Month</small>
+            </div>
+            <div class="stat-card">
+                <h3>Savings Rate</h3>
+                <p><%= savingsRate %>%</p>
+                <small>Of Income Saved</small>
+            </div>
+        </div>
+
+        <!-- Real Quick Actions -->
+        <div class="quick-actions">
+            <a href="/add-income" class="btn btn-success">+ Add Income</a>
+            <a href="/add-expense" class="btn btn-danger">+ Add Expense</a>
+            <a href="/transactions" class="btn btn-info">View All Transactions</a>
+            <a href="/budgets/set" class="btn btn-warning">Set Budget</a>
+            <a href="/goals/create" class="btn btn-primary">Create Goal</a>
+            <a href="/forecast" class="btn btn-secondary">View Forecast</a>
+        </div>
+
+        <!-- Real AI Insights -->
+        <!-- <div class="ai-insights">
+            <h3>🤖 AI Financial Advisor</h3>
+            <div class="ai-analysis">
+                <p><strong>📊 AI Spending Analysis</strong></p>
+                <p>Total Analyzed: ₹<%= aiInsights.totalAnalyzed %></p>
+                <p>Top Category: <%= aiInsights.topCategory %></p>
+            </div>
+            <div class="ai-recommendations">
+                <p><strong>💡 AI Recommendations</strong></p>
+                <% aiInsights.recommendations.forEach(rec => { %>
+                    <p>• <%= rec %></p>
+                <% }); %>
+            </div>
+        </div> -->
+
+        <!-- Budget Status -->
+        <% if (hasBudget) { %>
+        <div class="budget-status">
+            <h3>📈 Budget Status</h3>
+            <p>Total Budget: ₹<%= totalBudget %> | Spent: ₹<%= totalSpent %></p>
+            <% Object.keys(budgetUtilization).forEach(category => { 
+                const util = budgetUtilization[category]; %>
+                <div class="budget-category <%= util.status %>">
+                    <span><%= category %>: ₹<%= util.spent %>/₹<%= util.planned %> (<%= util.utilization %>%)</span>
+                </div>
+            <% }); %>
+        </div>
+        <% } %>
+
+        <!-- Recent Transactions -->
+        <% if (hasTransactions) { %>
+        <div class="recent-transactions">
+            <h3>📋 Recent Transactions</h3>
+            <% recentTransactions.forEach(transaction => { %>
+                <div class="transaction-item">
+                    <div>
+                        <strong><%= transaction.description %></strong>
+                        <br>
+                        <small><%= transaction.category %> • <%= transaction.date.toLocaleDateString() %></small>
+                    </div>
+                    <div class="transaction-amount <%= transaction.type %>">
+                        ₹<%= transaction.amount %>
+                    </div>
+                </div>
+            <% }); %>
+        </div>
+        <% } %>
+
+        <!-- No Data Message -->
+        <% if (!hasTransactions) { %>
+        <div class="ai-insights">
+            <h3>📊 Get Started</h3>
+            <p>No transactions yet. Start by adding your first income or expense to see insights and recommendations.</p>
+            <div class="quick-actions">
+                <a href="/add-income" class="btn btn-success">Add First Income</a>
+                <a href="/add-expense" class="btn btn-danger">Add First Expense</a>
+            </div>
+        </div>
+        <% } %>
+    </main>
+</body>
+</html>
